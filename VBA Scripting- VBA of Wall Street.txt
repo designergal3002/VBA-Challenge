@@ -1,0 +1,97 @@
+Sub StockData()
+
+'Script to run on all sheets within Workbook
+
+For Each ws In Worksheets
+    ws.Activate
+
+'Declare variables for problem
+
+    Dim Ticker As String
+    Dim YearlyChange As Double
+    Dim PercentChange As Double
+    Dim Volume As Double
+    Dim rowcount As Double
+    Dim StockOpen As Double
+    Dim StockClose As Double
+    Dim Row_Summary As Double
+    Row_Summary = 2
+    
+    
+        
+'Create Column Header for each task
+
+        Range("I1").Value = "Ticker"
+        Range("J1").Value = "Yearly Change"
+        Range("K1").Value = "Percent Change"
+        Range("L1").Value = "Total Stock Volume"
+        
+'Count number of rows
+
+        rowcount = Cells(Rows.Count, 1).End(xlUp).Row
+        'MsgBox (rowcount)
+
+'Identify Unique Ticker symbols in Column A
+
+        For i = 2 To rowcount
+        
+        
+            If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+            
+'Import Data Into new columns
+                
+                Ticker = Cells(i, 1).Value
+                Volume = Volume + Cells(i, 7).Value
+                
+                Range("I" & Row_Summary).Value = Ticker
+                Range("L" & Row_Summary).Value = Volume
+               
+                Volume = 0
+
+                StockClose = Cells(i, 6)
+       
+                 If StockOpen = 0 Then
+                    YearlyChange = 0
+                    PercentChange = 0
+                    
+                    Else:
+                        YearlyChange = StockClose - StockOpen
+                        PercentChange = (StockClose - StockOpen) / StockOpen
+                        
+                End If
+                
+                       Range("J" & Row_Summary).Value = YearlyChange
+                       Range("K" & Row_Summary).Value = PercentChange
+                       Range("K" & Row_Summary).Style = "Percent"
+                       Range("K" & Row_Summary).NumberFormat = "0.00%"
+            
+                        Row_Summary = Row_Summary + 1
+            
+                    ElseIf Cells(i - 1, 1).Value <> Cells(i, 1) Then
+                         StockOpen = Cells(i, 3)
+                
+                
+                    Else: Volume = Volume + Cells(i, 7).Value
+                
+                End If
+                
+                
+         Next i
+         
+'Apply conditional formatting as Red or Green based on positive or negative # in Yearly Change Column
+         
+         For j = 2 To rowcount
+            
+                If Range("J" & j).Value > 0 Then
+                     Range("J" & j).Interior.ColorIndex = 4
+                
+                    ElseIf Range("J" & j).Value < 0 Then
+                    Range("J" & j).Interior.ColorIndex = 3
+                    
+                End If
+                
+        Next j
+        
+Next ws
+        
+End Sub
